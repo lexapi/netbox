@@ -151,6 +151,7 @@ class CustomFieldBehaviorPanel(panels.ObjectAttributesPanel):
     search_weight = attrs.TemplatedAttr(
         'search_weight',
         template_name='extras/customfield/attrs/search_weight.html',
+        label=_('Search weight'),
     )
     filter_logic = attrs.ChoiceAttr('filter_logic')
     weight = attrs.NumericAttr('weight', label=_('Display weight'))
@@ -197,7 +198,7 @@ class CustomFieldChoiceSetPanel(panels.ObjectAttributesPanel):
     name = attrs.TextAttr('name')
     description = attrs.TextAttr('description')
     base_choices = attrs.ChoiceAttr('base_choices')
-    order_alphabetically = attrs.BooleanAttr('order_alphabetically')
+    order_alphabetically = attrs.BooleanAttr('order_alphabetically', label=_('Order alphabetically'))
     choices_for = attrs.RelatedObjectListAttr('choices_for', linkify=True, label=_('Used by'))
 
 
@@ -412,6 +413,7 @@ class TagPanel(panels.ObjectAttributesPanel):
     tagged_items = attrs.TemplatedAttr(
         'extras_taggeditem_items',
         template_name='extras/tag/attrs/tagged_item_count.html',
+        label=_('Tagged items'),
     )
 
 
@@ -486,7 +488,7 @@ class ConfigTemplatePanel(panels.ObjectAttributesPanel):
         'data_path',
         template_name='extras/configtemplate/attrs/data_file.html',
     )
-    data_synced = attrs.DateTimeAttr('data_synced')
+    data_synced = attrs.DateTimeAttr('data_synced', label=_('Data synced'))
     auto_sync_enabled = attrs.BooleanAttr('auto_sync_enabled')
 
 

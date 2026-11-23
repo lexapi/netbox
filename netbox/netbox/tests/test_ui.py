@@ -2,8 +2,11 @@ from decimal import Decimal
 from types import SimpleNamespace
 
 from django.template import Context, Template
-from django.test import RequestFactory, SimpleTestCase, TestCase
+from django.test import RequestFactory, SimpleTestCase, TestCase, tag
 from django.urls import reverse
+from django.utils import translation
+from django.utils.functional import Promise
+from django.utils.translation import gettext
 from netaddr import IPNetwork
 
 from account.models import UserToken
@@ -15,15 +18,36 @@ from circuits.models import (
     VirtualCircuitTermination,
     VirtualCircuitType,
 )
+from circuits.ui.panels import CircuitPanel
 from core.models import ConfigRevision, ObjectType
 from dcim.choices import InterfaceTypeChoices
 from dcim.models import Interface, Region, Site
+from dcim.ui.panels import (
+    DeviceDeviceTypePanel,
+    DeviceDimensionsPanel,
+    DevicePanel,
+    DeviceTypePanel,
+    FrontPortPanel,
+    RackNumberingPanel,
+    RackPanel,
+    RackWeightPanel,
+    RearPortPanel,
+    SitePanel,
+    VirtualDeviceContextPanel,
+)
+from extras.ui.panels import (
+    ConfigTemplatePanel,
+    CustomFieldBehaviorPanel,
+    CustomFieldChoiceSetPanel,
+    TagPanel,
+)
 from netbox.ui import attrs
 from netbox.ui.breadcrumbs import Breadcrumb
 from netbox.ui.layout import SimpleLayout
 from netbox.ui.panels import ObjectsTablePanel
 from netbox.ui.utils import build_coords_url
 from users.models import ObjectPermission, User
+from users.ui.panels import TokenPanel
 from utilities.testing import create_test_device
 from utilities.views import get_view
 from vpn.choices import (
@@ -36,6 +60,7 @@ from vpn.choices import (
     IPSecModeChoices,
 )
 from vpn.models import IKEPolicy, IKEProposal, IPSecPolicy, IPSecProfile
+from vpn.ui.panels import L2VPNPanel
 
 
 class ChoiceAttrTestCase(TestCase):
@@ -1365,3 +1390,47 @@ class RenderBreadcrumbsTagRenderTestCase(TestCase):
         self.assertInHTML(
             f'<li class="breadcrumb-item"><a href="{reverse("dcim:region_list")}">Regions</a></li>', html
         )
+
+
+class PanelAttributeLabelTranslationTestCase(SimpleTestCase):
+    """
+    Labels generated from attribute names are built at runtime and never reach the translation
+    catalogs, so they must be declared explicitly.
+    """
+
+    @tag('regression')  # Ref: #23778
+    def test_labels_translated(self):
+        cases = [
+            (CircuitPanel, 'commit_rate', 'Commit rate'),
+            (SitePanel, 'timezone', 'Timezone'),
+            (SitePanel, 'physical_address', 'Physical address'),
+            (SitePanel, 'shipping_address', 'Shipping address'),
+            (RackNumberingPanel, 'starting_unit', 'Starting unit'),
+            (RackPanel, 'space_utilization', 'Space utilization'),
+            (RackPanel, 'power_utilization', 'Power utilization'),
+            (RackWeightPanel, 'total_weight', 'Total weight'),
+            (DevicePanel, 'parent_device', 'Parent device'),
+            (DeviceDeviceTypePanel, 'front_image', 'Front image'),
+            (DeviceDeviceTypePanel, 'rear_image', 'Rear image'),
+            (DeviceDimensionsPanel, 'total_weight', 'Total weight'),
+            (DeviceTypePanel, 'full_depth', 'Full depth'),
+            (DeviceTypePanel, 'front_image', 'Front image'),
+            (DeviceTypePanel, 'rear_image', 'Rear image'),
+            (FrontPortPanel, 'positions', 'Positions'),
+            (RearPortPanel, 'positions', 'Positions'),
+            (VirtualDeviceContextPanel, 'identifier', 'Identifier'),
+            (CustomFieldBehaviorPanel, 'search_weight', 'Search weight'),
+            (CustomFieldChoiceSetPanel, 'order_alphabetically', 'Order alphabetically'),
+            (TagPanel, 'tagged_items', 'Tagged items'),
+            (ConfigTemplatePanel, 'data_synced', 'Data synced'),
+            (TokenPanel, 'key', 'Key'),
+            (TokenPanel, 'pepper_id', 'Pepper ID'),
+            (TokenPanel, 'last_used', 'Last used'),
+            (L2VPNPanel, 'identifier', 'Identifier'),
+        ]
+        with translation.override('de'):
+            for panel, attr_name, msgid in cases:
+                with self.subTest(panel=panel.__name__, attr=attr_name):
+                    label = panel._attrs[attr_name].label
+                    self.assertIsInstance(label, Promise)
+                    self.assertEqual(str(label), gettext(msgid))

@@ -124,7 +124,11 @@ class CircuitPanel(panels.ObjectAttributesPanel):
     tenant = attrs.RelatedObjectAttr('tenant', linkify=True, grouped_by='group')
     install_date = attrs.DateTimeAttr('install_date', spec='date')
     termination_date = attrs.DateTimeAttr('termination_date', spec='date')
-    commit_rate = attrs.TemplatedAttr('commit_rate', template_name='circuits/circuit/attrs/commit_rate.html')
+    commit_rate = attrs.TemplatedAttr(
+        'commit_rate',
+        template_name='circuits/circuit/attrs/commit_rate.html',
+        label=_('Commit rate')
+    )
     description = attrs.TextAttr('description')
 
 

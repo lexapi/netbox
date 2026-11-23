@@ -36,9 +36,19 @@ class SitePanel(panels.ObjectAttributesPanel):
     tenant = attrs.RelatedObjectAttr('tenant', linkify=True, grouped_by='group')
     facility = attrs.TextAttr('facility')
     description = attrs.TextAttr('description')
-    timezone = attrs.TimezoneAttr('time_zone')
-    physical_address = attrs.AddressAttr('physical_address', map_url=True, copy_button=True)
-    shipping_address = attrs.AddressAttr('shipping_address', map_url=True, copy_button=True)
+    timezone = attrs.TimezoneAttr('time_zone', label=_('Timezone'))
+    physical_address = attrs.AddressAttr(
+        'physical_address',
+        map_url=True,
+        copy_button=True,
+        label=_('Physical address')
+    )
+    shipping_address = attrs.AddressAttr(
+        'shipping_address',
+        map_url=True,
+        copy_button=True,
+        label=_('Shipping address')
+    )
     gps_coordinates = attrs.GPSCoordinatesAttr()
 
 
@@ -60,7 +70,7 @@ class RackDimensionsPanel(panels.ObjectAttributesPanel):
 
 
 class RackNumberingPanel(panels.ObjectAttributesPanel):
-    starting_unit = attrs.TextAttr('starting_unit')
+    starting_unit = attrs.TextAttr('starting_unit', label=_('Starting unit'))
     desc_units = attrs.BooleanAttr('desc_units', label=_('Descending units'))
 
 
@@ -81,14 +91,18 @@ class RackPanel(panels.ObjectAttributesPanel):
     airflow = attrs.ChoiceAttr('airflow')
     cooling_capability = attrs.ChoiceAttr('cooling_capability')
     cooling_capacity = attrs.TextAttr('cooling_capacity', format_string=_('{} kW'))
-    space_utilization = attrs.UtilizationAttr('get_utilization')
-    power_utilization = attrs.UtilizationAttr('get_power_utilization')
+    space_utilization = attrs.UtilizationAttr('get_utilization', label=_('Space utilization'))
+    power_utilization = attrs.UtilizationAttr('get_power_utilization', label=_('Power utilization'))
 
 
 class RackWeightPanel(panels.ObjectAttributesPanel):
     weight = attrs.WeightAttr('weight')
     max_weight = attrs.WeightAttr('max_weight', label=_('Maximum weight'))
-    total_weight = attrs.TemplatedAttr('total_weight', template_name='dcim/attrs/total_weight.html')
+    total_weight = attrs.TemplatedAttr(
+        'total_weight',
+        template_name='dcim/attrs/total_weight.html',
+        label=_('Total weight')
+    )
 
 
 class RackRolePanel(panels.OrganizationalObjectPanel):
@@ -118,7 +132,11 @@ class DevicePanel(panels.ObjectAttributesPanel):
     location = attrs.NestedObjectAttr('location', linkify=True)
     rack = attrs.TemplatedAttr('rack', template_name='dcim/device/attrs/rack.html')
     virtual_chassis = attrs.RelatedObjectAttr('virtual_chassis', linkify=True)
-    parent_device = attrs.TemplatedAttr('parent_bay', template_name='dcim/device/attrs/parent_device.html')
+    parent_device = attrs.TemplatedAttr(
+        'parent_bay',
+        template_name='dcim/device/attrs/parent_device.html',
+        label=_('Parent device')
+    )
     gps_coordinates = attrs.GPSCoordinatesAttr()
     tenant = attrs.RelatedObjectAttr('tenant', linkify=True, grouped_by='group')
     description = attrs.TextAttr('description')
@@ -159,14 +177,18 @@ class DeviceDeviceTypePanel(panels.ObjectAttributesPanel):
     manufacturer = attrs.RelatedObjectAttr('device_type.manufacturer', linkify=True)
     model = attrs.RelatedObjectAttr('device_type', linkify=True)
     height = attrs.TemplatedAttr('device_type.u_height', template_name='dcim/devicetype/attrs/height.html')
-    front_image = attrs.ImageAttr('device_type.front_image')
-    rear_image = attrs.ImageAttr('device_type.rear_image')
+    front_image = attrs.ImageAttr('device_type.front_image', label=_('Front image'))
+    rear_image = attrs.ImageAttr('device_type.rear_image', label=_('Rear image'))
 
 
 class DeviceDimensionsPanel(panels.ObjectAttributesPanel):
     title = _('Dimensions')
 
-    total_weight = attrs.TemplatedAttr('total_weight', template_name='dcim/attrs/total_weight.html')
+    total_weight = attrs.TemplatedAttr(
+        'total_weight',
+        template_name='dcim/attrs/total_weight.html',
+        label=_('Total weight')
+    )
 
 
 class DeviceRolePanel(panels.NestedGroupObjectPanel):
@@ -183,14 +205,14 @@ class DeviceTypePanel(panels.ObjectAttributesPanel):
     description = attrs.TextAttr('description')
     height = attrs.TemplatedAttr('u_height', template_name='dcim/devicetype/attrs/height.html')
     exclude_from_utilization = attrs.BooleanAttr('exclude_from_utilization')
-    full_depth = attrs.BooleanAttr('is_full_depth')
+    full_depth = attrs.BooleanAttr('is_full_depth', label=_('Full depth'))
     weight = attrs.WeightAttr('weight')
     subdevice_role = attrs.ChoiceAttr('subdevice_role', label=_('Parent/child'))
     cooling_method = attrs.ChoiceAttr('cooling_method')
     airflow = attrs.ChoiceAttr('airflow')
     end_of_life = attrs.DateTimeAttr('end_of_life', spec='date')
-    front_image = attrs.ImageAttr('front_image')
-    rear_image = attrs.ImageAttr('rear_image')
+    front_image = attrs.ImageAttr('front_image', label=_('Front image'))
+    rear_image = attrs.ImageAttr('rear_image', label=_('Rear image'))
 
 
 class ModulePanel(panels.ObjectAttributesPanel):
@@ -309,7 +331,7 @@ class FrontPortPanel(panels.ObjectAttributesPanel):
     label = attrs.TextAttr('label')
     type = attrs.ChoiceAttr('type')
     color = attrs.ColorAttr('color')
-    positions = attrs.NumericAttr('positions')
+    positions = attrs.NumericAttr('positions', label=_('Positions'))
     description = attrs.TextAttr('description')
 
 
@@ -320,7 +342,7 @@ class RearPortPanel(panels.ObjectAttributesPanel):
     label = attrs.TextAttr('label')
     type = attrs.ChoiceAttr('type')
     color = attrs.ColorAttr('color')
-    positions = attrs.NumericAttr('positions')
+    positions = attrs.NumericAttr('positions', label=_('Positions'))
     description = attrs.TextAttr('description')
 
 
@@ -456,7 +478,7 @@ class CoolingFeedCharacteristicsPanel(panels.ObjectAttributesPanel):
 class VirtualDeviceContextPanel(panels.ObjectAttributesPanel):
     name = attrs.TextAttr('name')
     device = attrs.RelatedObjectAttr('device', linkify=True)
-    identifier = attrs.TextAttr('identifier')
+    identifier = attrs.TextAttr('identifier', label=_('Identifier'))
     status = attrs.ChoiceAttr('status')
     primary_ip4 = attrs.TemplatedAttr(
         'primary_ip4',

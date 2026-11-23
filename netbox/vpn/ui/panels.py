@@ -90,7 +90,7 @@ class IPSecProfileIPSecPolicyPanel(panels.ObjectAttributesPanel):
 
 class L2VPNPanel(panels.ObjectAttributesPanel):
     name = attrs.TextAttr('name')
-    identifier = attrs.TextAttr('identifier')
+    identifier = attrs.TextAttr('identifier', label=_('Identifier'))
     type = attrs.ChoiceAttr('type')
     status = attrs.ChoiceAttr('status')
     description = attrs.TextAttr('description')
